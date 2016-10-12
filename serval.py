@@ -105,6 +105,12 @@ def XButtonProcessor(ui):
 def YButtonProcessor(ui):
     return SingleButtonProcessor(ui, 308, e.KEY_Y)
 
+def LBButtonProcessor(ui):
+    return SingleButtonProcessor(ui, 310, e.KEY_L)
+
+def RBButtonProcessor(ui):
+    return SingleButtonProcessor(ui, 311, e.KEY_R)
+
 def find_razer_serval():
     devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
 
@@ -121,7 +127,7 @@ def main():
     print(dev)
 
     event_processor_classes = [ArrowEventProcessor, AnalogStickProcessor, AButtonProcessor, BButtonProcessor,
-                               XButtonProcessor, YButtonProcessor]
+                               XButtonProcessor, YButtonProcessor, LBButtonProcessor, RBButtonProcessor]
     event_processors = []
 
     for event_processor_class in event_processor_classes:
