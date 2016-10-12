@@ -99,7 +99,11 @@ def main():
     dev = find_razer_serval()
     print(dev)
 
-    event_processors = [ArrowEventProcessor(ui), AnalogStickProcessor(ui)]
+    event_processor_classes = [ArrowEventProcessor, AnalogStickProcessor]
+    event_processors = []
+
+    for event_processor_class in event_processor_classes:
+        event_processors.append(event_processor_class(ui))
 
     if dev is not None:
         for event in dev.read_loop():
