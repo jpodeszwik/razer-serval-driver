@@ -16,13 +16,10 @@ class ArrowEventProcessor:
 
     def left_right_event(self, event):
         if event.value == -1:
-            print('left')
             self.ui.write(e.EV_KEY, e.KEY_LEFT, 1)
         elif event.value == 1:
-            print('right')
             self.ui.write(e.EV_KEY, e.KEY_RIGHT, 1)
         else:
-            print('release')
             self.ui.write(e.EV_KEY, e.KEY_RIGHT, 0)
             self.ui.write(e.EV_KEY, e.KEY_LEFT, 0)
 
@@ -30,13 +27,10 @@ class ArrowEventProcessor:
 
     def up_down_event(self, event):
         if event.value == -1:
-            print('up')
             self.ui.write(e.EV_KEY, e.KEY_UP, 1)
         elif event.value == 1:
-            print('down')
             self.ui.write(e.EV_KEY, e.KEY_DOWN, 1)
         else:
-            print('release')
             self.ui.write(e.EV_KEY, e.KEY_UP, 0)
             self.ui.write(e.EV_KEY, e.KEY_DOWN, 0)
 
@@ -57,13 +51,10 @@ class AnalogStickProcessor:
 
     def left_right_event(self, event):
         if event.value < 128 - self.delta:
-            print('left')
             self.ui.write(e.EV_KEY, e.KEY_LEFT, 1)
         elif event.value > 128 + self.delta:
-            print('right')
             self.ui.write(e.EV_KEY, e.KEY_RIGHT, 1)
         else:
-            print('release')
             self.ui.write(e.EV_KEY, e.KEY_RIGHT, 0)
             self.ui.write(e.EV_KEY, e.KEY_LEFT, 0)
 
@@ -71,18 +62,48 @@ class AnalogStickProcessor:
 
     def up_down_event(self, event):
         if event.value < 128 - self.delta:
-            print('up')
             self.ui.write(e.EV_KEY, e.KEY_UP, 1)
         elif event.value > 128 + self.delta:
-            print('down')
             self.ui.write(e.EV_KEY, e.KEY_DOWN, 1)
         else:
-            print('release')
             self.ui.write(e.EV_KEY, e.KEY_UP, 0)
             self.ui.write(e.EV_KEY, e.KEY_DOWN, 0)
 
         self.ui.syn()
 
+
+class SingleButtonProcessor:
+    def __init__(self, ui, input_code, output_code):
+        self.ui = ui
+        self.input_code = input_code
+        self.output_code = output_code
+
+    def instance(self, ui):
+        self.ui = ui
+        return self
+
+    def process_event(self, event):
+        if event.type == 1:
+            if event.code == self.input_code:
+                if event.value == 1:
+                    self.ui.write(e.EV_KEY, self.output_code, 1)
+                elif event.value == 0:
+                    self.ui.write(e.EV_KEY, self.output_code, 0)
+
+                self.ui.syn()
+
+
+def AButtonProcessor(ui):
+    return SingleButtonProcessor(ui, 304, e.KEY_A)
+
+def BButtonProcessor(ui):
+    return SingleButtonProcessor(ui, 305, e.KEY_B)
+
+def XButtonProcessor(ui):
+    return SingleButtonProcessor(ui, 307, e.KEY_X)
+
+def YButtonProcessor(ui):
+    return SingleButtonProcessor(ui, 308, e.KEY_Y)
 
 def find_razer_serval():
     devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
@@ -99,16 +120,17 @@ def main():
     dev = find_razer_serval()
     print(dev)
 
-    event_processor_classes = [ArrowEventProcessor, AnalogStickProcessor]
+    event_processor_classes = [ArrowEventProcessor, AnalogStickProcessor, AButtonProcessor, BButtonProcessor,
+                               XButtonProcessor, YButtonProcessor]
     event_processors = []
 
     for event_processor_class in event_processor_classes:
         event_processors.append(event_processor_class(ui))
 
     if dev is not None:
-        for event in dev.read_loop():
-            for processor in event_processors:
-                processor.process_event(event)
+            for event in dev.read_loop():
+                for processor in event_processors:
+                    processor.process_event(event)
 
 
 if __name__ == '__main__':
