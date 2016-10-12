@@ -72,6 +72,32 @@ class AnalogStickProcessor:
         self.ui.syn()
 
 
+class AnalogButtonProcessor:
+    def __init__(self, ui, input_code, output_code):
+        self.delta = 20
+        self.ui = ui
+        self.input_code = input_code
+        self.output_code = output_code
+
+    def process_event(self, event):
+        if event.type == 3:
+            if event.code == self.input_code:
+                if event.value > self.delta:
+                    self.ui.write(e.EV_KEY, self.output_code, 1)
+                else:
+                    self.ui.write(e.EV_KEY, self.output_code, 0)
+
+                self.ui.syn()
+
+
+def LTButtonProcessor(ui):
+    return AnalogButtonProcessor(ui, 9, e.KEY_K)
+
+
+def RTButtonProcessor(ui):
+    return AnalogButtonProcessor(ui, 10, e.KEY_E)
+
+
 class SingleButtonProcessor:
     def __init__(self, ui, input_code, output_code):
         self.ui = ui
@@ -96,20 +122,26 @@ class SingleButtonProcessor:
 def AButtonProcessor(ui):
     return SingleButtonProcessor(ui, 304, e.KEY_A)
 
+
 def BButtonProcessor(ui):
     return SingleButtonProcessor(ui, 305, e.KEY_B)
+
 
 def XButtonProcessor(ui):
     return SingleButtonProcessor(ui, 307, e.KEY_X)
 
+
 def YButtonProcessor(ui):
     return SingleButtonProcessor(ui, 308, e.KEY_Y)
+
 
 def LBButtonProcessor(ui):
     return SingleButtonProcessor(ui, 310, e.KEY_L)
 
+
 def RBButtonProcessor(ui):
     return SingleButtonProcessor(ui, 311, e.KEY_R)
+
 
 def find_razer_serval():
     devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
@@ -127,7 +159,8 @@ def main():
     print(dev)
 
     event_processor_classes = [ArrowEventProcessor, AnalogStickProcessor, AButtonProcessor, BButtonProcessor,
-                               XButtonProcessor, YButtonProcessor, LBButtonProcessor, RBButtonProcessor]
+                               XButtonProcessor, YButtonProcessor, LBButtonProcessor, RBButtonProcessor,
+                               LTButtonProcessor, RTButtonProcessor]
     event_processors = []
 
     for event_processor_class in event_processor_classes:
