@@ -1,6 +1,7 @@
-from evdev import UInput, AbsInfo
+from evdev import UInput, AbsInfo, InputDevice
 from evdev import ecodes as e
 import evdev
+from config import key_left, key_right, key_up, key_down, key_a, key_b, key_x, key_y, key_lt, key_lb, key_rt, key_rb
 
 
 class ArrowEventProcessor:
@@ -16,23 +17,23 @@ class ArrowEventProcessor:
 
     def left_right_event(self, event):
         if event.value == -1:
-            self.ui.write(e.EV_KEY, e.KEY_LEFT, 1)
+            self.ui.write(e.EV_KEY, key_left, 1)
         elif event.value == 1:
-            self.ui.write(e.EV_KEY, e.KEY_RIGHT, 1)
+            self.ui.write(e.EV_KEY, key_right, 1)
         else:
-            self.ui.write(e.EV_KEY, e.KEY_RIGHT, 0)
-            self.ui.write(e.EV_KEY, e.KEY_LEFT, 0)
+            self.ui.write(e.EV_KEY, key_right, 0)
+            self.ui.write(e.EV_KEY, key_left, 0)
 
         self.ui.syn()
 
     def up_down_event(self, event):
         if event.value == -1:
-            self.ui.write(e.EV_KEY, e.KEY_UP, 1)
+            self.ui.write(e.EV_KEY, key_up, 1)
         elif event.value == 1:
-            self.ui.write(e.EV_KEY, e.KEY_DOWN, 1)
+            self.ui.write(e.EV_KEY, key_down, 1)
         else:
-            self.ui.write(e.EV_KEY, e.KEY_UP, 0)
-            self.ui.write(e.EV_KEY, e.KEY_DOWN, 0)
+            self.ui.write(e.EV_KEY, key_up, 0)
+            self.ui.write(e.EV_KEY, key_down, 0)
 
         self.ui.syn()
 
@@ -51,23 +52,23 @@ class AnalogStickProcessor:
 
     def left_right_event(self, event):
         if event.value < 128 - self.delta:
-            self.ui.write(e.EV_KEY, e.KEY_LEFT, 1)
+            self.ui.write(e.EV_KEY, key_left, 1)
         elif event.value > 128 + self.delta:
-            self.ui.write(e.EV_KEY, e.KEY_RIGHT, 1)
+            self.ui.write(e.EV_KEY, key_right, 1)
         else:
-            self.ui.write(e.EV_KEY, e.KEY_RIGHT, 0)
-            self.ui.write(e.EV_KEY, e.KEY_LEFT, 0)
+            self.ui.write(e.EV_KEY, key_right, 0)
+            self.ui.write(e.EV_KEY, key_left, 0)
 
         self.ui.syn()
 
     def up_down_event(self, event):
         if event.value < 128 - self.delta:
-            self.ui.write(e.EV_KEY, e.KEY_UP, 1)
+            self.ui.write(e.EV_KEY, key_up, 1)
         elif event.value > 128 + self.delta:
-            self.ui.write(e.EV_KEY, e.KEY_DOWN, 1)
+            self.ui.write(e.EV_KEY, key_down, 1)
         else:
-            self.ui.write(e.EV_KEY, e.KEY_UP, 0)
-            self.ui.write(e.EV_KEY, e.KEY_DOWN, 0)
+            self.ui.write(e.EV_KEY, key_up, 0)
+            self.ui.write(e.EV_KEY, key_down, 0)
 
         self.ui.syn()
 
@@ -120,11 +121,11 @@ class AnalogButtonProcessor:
 
 
 def LTButtonProcessor(ui):
-    return AnalogButtonProcessor(ui, 9, e.KEY_K)
+    return AnalogButtonProcessor(ui, 10, key_lt)
 
 
 def RTButtonProcessor(ui):
-    return AnalogButtonProcessor(ui, 10, e.KEY_E)
+    return AnalogButtonProcessor(ui, 9, key_rt)
 
 
 class SingleButtonProcessor:
@@ -149,31 +150,31 @@ class SingleButtonProcessor:
 
 
 def AButtonProcessor(ui):
-    return SingleButtonProcessor(ui, 304, e.KEY_A)
+    return SingleButtonProcessor(ui, 304, key_a)
 
 
 def BButtonProcessor(ui):
-    return SingleButtonProcessor(ui, 305, e.KEY_B)
+    return SingleButtonProcessor(ui, 305, key_b)
 
 
 def XButtonProcessor(ui):
-    return SingleButtonProcessor(ui, 307, e.KEY_X)
+    return SingleButtonProcessor(ui, 307, key_x)
 
 
 def YButtonProcessor(ui):
-    return SingleButtonProcessor(ui, 308, e.KEY_Y)
+    return SingleButtonProcessor(ui, 308, key_y)
 
 
 def LBButtonProcessor(ui):
-    return SingleButtonProcessor(ui, 310, e.KEY_L)
+    return SingleButtonProcessor(ui, 310, key_lb)
 
 
 def RBButtonProcessor(ui):
-    return SingleButtonProcessor(ui, 311, e.KEY_R)
+    return SingleButtonProcessor(ui, 311, key_rb)
 
 
 def find_razer_serval():
-    devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
+    devices = [InputDevice(fn) for fn in evdev.list_devices()]
 
     for device in devices:
         if device.name == 'Razer Razer Serval':
@@ -184,11 +185,11 @@ def find_razer_serval():
 
 def main():
     cap = {
-            e.EV_KEY : [e.KEY_A, e.KEY_B, e.KEY_X, e.KEY_Y, e.KEY_L, e.KEY_R, e.KEY_K, e.KEY_E, e.KEY_UP, e.KEY_DOWN, e.KEY_LEFT, e.KEY_RIGHT],
-            e.EV_REL : [
-                (e.REL_Y, AbsInfo(0, 0, 255, 0, 0, 0)),
-                (e.REL_X, AbsInfo(0, 0, 255, 0, 0, 0))
-                ]
+        e.EV_KEY: [key_a, key_b, key_x, key_y, key_lt, key_rt, key_rb, key_lb, key_up, key_down, key_left, key_right],
+        e.EV_REL: [
+            (e.REL_Y, AbsInfo(0, 0, 255, 0, 0, 0)),
+            (e.REL_X, AbsInfo(0, 0, 255, 0, 0, 0))
+            ]
         }
     ui = UInput(cap, name='razer-serval-virtual-device')
     dev = find_razer_serval()
