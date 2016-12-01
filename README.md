@@ -8,11 +8,12 @@ Install requirements. You can use virtualenv, or just:
 
 ## Usage:
 
-1. Connect and turn on your razer serval
-2. Disable default serval input. You can use command:
-
-```xinput --disable "$(xinput list --id-only 'Razer Razer Serval')"```
-3. Run driver:
+* Connect and turn on your razer serval
+* Disable default serval input. You can use command:
+```bash
+xinput --disable "$(xinput list --id-only 'Razer Razer Serval')"
+```
+* Run driver:
 
 ```sudo python serval.py```
 
